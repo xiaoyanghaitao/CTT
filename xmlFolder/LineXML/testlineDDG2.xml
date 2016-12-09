@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<Datasets>
+    <Dataset>
+        <Name>d1</Name>
+        <Size>29.46218035877467</Size>
+        <GenTime>1.7538510082678405</GenTime>
+        <UsageFrequency>0.0014251556148581906</UsageFrequency>
+        <DelayTolerance>9775.046530747417</DelayTolerance>
+        <CostTolerance>1.0</CostTolerance>
+        <Successors>
+            <Successor>d2</Successor>
+        </Successors>
+    </Dataset>
+    <Dataset>
+        <Name>d2</Name>
+        <Size>78.51022508016662</Size>
+        <GenTime>3.8864802109584407</GenTime>
+        <UsageFrequency>0.0022615736454145788</UsageFrequency>
+        <DelayTolerance>3129.1603152805797</DelayTolerance>
+        <CostTolerance>1.0</CostTolerance>
+        <Predecessors>
+            <Predecessor>d1</Predecessor>
+        </Predecessors>
+    </Dataset>
+</Datasets>
