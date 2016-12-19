@@ -271,7 +271,7 @@ public class CTT_SP3 {
 	}
 	// /////////////////////////////////////
 	public static void main(String[] args) {
-		DDGGenerator.setFilePath("xmlFolder/LineXML/testlineDDG5.xml");
+		DDGGenerator.setFilePath("xmlFolder/LineXML/testlineDDG500.xml");
 		DataDependencyGraph graph = DDGGenerator.getDDG();
 		long startTime = System.currentTimeMillis();
 		double result;

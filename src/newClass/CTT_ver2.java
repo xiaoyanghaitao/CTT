@@ -15,7 +15,8 @@ public class CTT_ver2 {
 	private int datasetNum;
 	private int cloudServiceID;
 	private double minGenCost; // 到达该顶点所用到的最小花销，默认为0
-	private double[] genLatterCost; // 生成某个数据集并存储到m个服务商上分别的花费
+	public double interGenCost; //中间数据集的最小生成花销，默认为0
+	private double[] verWeightForCurrentDataset; // 生成当前运算的数据集的最小生成代价
 
 	public CTT_ver2(int cloudServiceNum) {
 		this(new Dataset(), -1, -1, cloudServiceNum);
@@ -27,7 +28,7 @@ public class CTT_ver2 {
 		datasetNum = dsno;
 		cloudServiceID = csid;
 		minGenCost = 0;
-		genLatterCost = new double[cloudServiceNum];
+		interGenCost = 0;
 	}
 
 	public Dataset getDataset() {
@@ -62,15 +63,12 @@ public class CTT_ver2 {
 		this.minGenCost = minGenCost;
 	}
 
-	public double[] getGenLatterCost() {
-		return genLatterCost;
+	public double[] getVerWeightForCurrentDataset() {
+		return verWeightForCurrentDataset;
 	}
 
-	public void setGenCostInK(int k, double cost) { // 生成保存在服务商k上的当前数据集的费用
-		genLatterCost[k] = cost;
+	public void setVerWeightForCurrentDataset(double[] verWeightForCurrentDataset) {
+		this.verWeightForCurrentDataset = verWeightForCurrentDataset;
 	}
 
-	public double getGenCostInK(int k) {
-		return genLatterCost[k];
-	}
 }
