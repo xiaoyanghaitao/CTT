@@ -14,9 +14,7 @@ import utilities.Dataset;
 
 public class Improved_CTT_SP3 {
 
-	private static CloudService[] CS = new CloudService[3];
-
-	private static double computeCttCost(DataDependencyGraph graph, int m) {
+	public static double computeCttCost(DataDependencyGraph graph, int m, CloudService[] CS) {
 		long startmxbe = 0;
 		long endmxbe = 0;
 		long timemxbe = 0;
@@ -45,42 +43,42 @@ public class Improved_CTT_SP3 {
 			// 初始化候选者列表
 			LinkedList<CTT_ver2> candidates = new LinkedList<>();
 			candidates.add(startVer);
-			CTT_ver2[] datasetKInCS = new CTT_ver2[m]; // Dk在所有服务商处存储的节点
+			CTT_ver2[] dataset_iInCS = new CTT_ver2[m]; // Di在所有服务商处存储的节点
 
-			for (int k = 0; k < datasetNum; k++) { // 遍历全部有意义的数据集，进行计算
+			for (int i = 0; i < datasetNum; i++) { // 遍历全部有意义的数据集，进行计算
 
-				// 找出到数据集K花销最小的存放方式
-				CTT_ver2 chosenStorageForK = null; // 最后数据集K存放的位置
+				// 找出到数据集i花销最小的存放方式
+				CTT_ver2 chosenStorageForI = null; // 最后数据集i存放的位置
 				for (int j = 0; j < m; j++) { // 创建位于所有服务商的顶点
-					datasetKInCS[j] = new CTT_ver2(datasets.get(k), k, j, m);
+					dataset_iInCS[j] = new CTT_ver2(datasets.get(i), i, j, m);
 					double minGenCost = Double.MAX_VALUE; // 存储到达当前顶点的最小成本
 					for (CTT_ver2 candidate : candidates) {
 						double genCostFromCandidate = candidate.getMinGenCost()
-								+ getEdgeCost(candidate, datasetKInCS[j]);
+								+ getEdgeCost(candidate, dataset_iInCS[j], CS);
 						if (minGenCost > genCostFromCandidate) { // 找出最小成本
 							minGenCost = genCostFromCandidate;
-							datasetKInCS[j].setPredecessor(candidate);
+							dataset_iInCS[j].setPredecessor(candidate);
 						}
 					}
-					datasetKInCS[j].setMinGenCost(minGenCost); // 将最小成本赋给顶点
-					if (chosenStorageForK == null || chosenStorageForK.getMinGenCost() > minGenCost) // 得到花费存储K最小的顶点
-						chosenStorageForK = datasetKInCS[j];
+					dataset_iInCS[j].setMinGenCost(minGenCost); // 将最小成本赋给顶点
+					if (chosenStorageForI == null || chosenStorageForI.getMinGenCost() > minGenCost) // 得到花费存储K最小的顶点
+						chosenStorageForI = dataset_iInCS[j];
 				}
 
 				// 对每个candidate计算数据集K在各个服务商上存放的verWeight
 				for (CTT_ver2 candidate : candidates) {
 					double[] verWeightForCurrentDataset = new double[m];
 					for (int j = 0; j < m; j++) {
-						verWeightForCurrentDataset[j] = getVerWeight(candidate, datasetKInCS[j]);
+						verWeightForCurrentDataset[j] = getVerWeight(candidate, dataset_iInCS[j], CS);
 					}
 					candidate.setVerWeightForCurrentDataset(verWeightForCurrentDataset);
 				}
 
 				// 对现有candidates进行淘汰
-				double[] chosenCosts = chosenStorageForK.getPredecessor().getVerWeightForCurrentDataset(); // 被选中的存储节点的前驱到之后各点的花费
+				double[] chosenCosts = chosenStorageForI.getPredecessor().getVerWeightForCurrentDataset(); // 被选中的存储节点的前驱到之后各点的花费
 				for (ListIterator<CTT_ver2> lit = candidates.listIterator(); lit.hasNext();) {
 					CTT_ver2 current = lit.next();
-					if (current.equals(chosenStorageForK.getPredecessor())) // 如果当前节点就是存储节点的前驱，则不用进行比较
+					if (current.equals(chosenStorageForI.getPredecessor())) // 如果当前节点就是存储节点的前驱，则不用进行比较
 						continue;
 					double[] currentCosts = current.getVerWeightForCurrentDataset();
 					boolean shouldRemove = false;
@@ -104,11 +102,11 @@ public class Improved_CTT_SP3 {
 						if (minVerWeight > verWeightForCurrentDataset[j])
 							minVerWeight = verWeightForCurrentDataset[j];
 					}
-					candidate.interGenCost += minVerWeight * datasets.get(k).getUsageFrequency(); // 动态规划，增加当前数据集的生成耗费
+					candidate.interGenCost += minVerWeight * datasets.get(i).getUsageFrequency(); // 动态规划，增加当前数据集的生成耗费
 				}
 
 				// 把所有新生成的节点加入到候选节点中
-				for (CTT_ver2 v : datasetKInCS)
+				for (CTT_ver2 v : dataset_iInCS)
 					candidates.add(v);
 			}
 
@@ -116,13 +114,22 @@ public class Improved_CTT_SP3 {
 			{
 				double minGenCost = Double.MAX_VALUE; // 存储到达当前顶点的最小成本
 				for (CTT_ver2 candidate : candidates) {
-					double costToEndVer = candidate.getMinGenCost() + getEdgeCost(candidate, endVer);
+					double costToEndVer = candidate.getMinGenCost() + getEdgeCost(candidate, endVer, CS);
 					if (minGenCost > costToEndVer) { // 找出最小成本
 						minGenCost = costToEndVer;
 						endVer.setPredecessor(candidate);
 					}
 				}
 				totalCostR = minGenCost;
+			}
+
+			CTT_ver2 storedVer = endVer.getPredecessor();
+			Dataset tmp = null;
+			while (!storedVer.getDataset().getName().equals("start")) {
+				tmp = storedVer.getDataset();
+				tmp.setcsid(storedVer.getCloudServiceID());
+				tmp.setStored(true);
+				storedVer = storedVer.getPredecessor();
 			}
 		}
 		endmxbe = threadMXBean.getCurrentThreadCpuTime();
@@ -132,7 +139,7 @@ public class Improved_CTT_SP3 {
 		return totalCostR;
 	}
 
-	private static double getVerWeight(CTT_ver2 start, CTT_ver2 end) {
+	private static double getVerWeight(CTT_ver2 start, CTT_ver2 end, CloudService[] CS) {
 		double verWeight = end.getDataset().getGenerationTime() * CS[end.getCloudServiceID()].getcostC(); // 在end所在的云服务商上计算的费用
 		// start的后继等于end，即无中间数据集
 		if (start.getDataset().getSuccessors().get(0).equals(end.getDataset())) {
@@ -159,7 +166,7 @@ public class Improved_CTT_SP3 {
 		return verWeight;
 	}
 
-	private static double getEdgeCost(CTT_ver2 candidate, CTT_ver2 target) {
+	private static double getEdgeCost(CTT_ver2 candidate, CTT_ver2 target, CloudService[] CS) {
 		double edgeCost = 0.0;// 整条边的cost
 		double endCost = 0.0;// 边的终点的cost
 		// 首先计算边的终点的存储代价
@@ -185,7 +192,7 @@ public class Improved_CTT_SP3 {
 
 	// /////////////////////////////////////
 	public static void main(String[] args) {
-		DDGGenerator.setFilePath("xmlFolder/LineXML/testlineDDG500.xml");
+		DDGGenerator.setFilePath("xmlFolder/LineXML/testlineDDG400.xml");
 		DataDependencyGraph graph = DDGGenerator.getDDG();
 		long startTime = System.currentTimeMillis();
 		double result;
@@ -195,11 +202,12 @@ public class Improved_CTT_SP3 {
 		CloudService CS0 = new CloudService(0.1 / 30, 0.11 * 24, 0.01, 0, bandwiths0);
 		CloudService CS1 = new CloudService(0.06 / 30, 0.12 * 24, 0.03, 1, bandwiths1);
 		CloudService CS2 = new CloudService(0.05 / 30, 0.15 * 24, 0.15, 2, bandwiths2);// costT由0.06变成0.1
+		CloudService[] CS = new CloudService[3];
 		CS[0] = CS0;
 		CS[1] = CS1;
 		CS[2] = CS2;
 		int m = 3;
-		result = Improved_CTT_SP3.computeCttCost(graph, m);
+		result = Improved_CTT_SP3.computeCttCost(graph, m, CS);
 		long endTime = System.currentTimeMillis();
 		System.out.println("Execution Time : " + (endTime - startTime) + "ms");
 		System.out.println("totalcost:" + result);

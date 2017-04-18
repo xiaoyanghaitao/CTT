@@ -55,6 +55,8 @@ public class CTT_SP3Print {
 				//相应云服务上存储数据集个数加1，并加入云服务对应的存储序列中
 				storeDSnum[ver1.getcsid()]++;
 				storeDS.get(ver1.getcsid()).add(ver1.getdataset().getName());
+				ver1.getdataset().setStored(true);
+				ver1.getdataset().setcsid(ver1.getcsid());
 				//计算存储数据集的存储代价
 				storecost=storecost+CS[ver1.getcsid()].getcostS()*ver1.getdataset().getSize();//每次只加源节点的存储cost即可
 			}

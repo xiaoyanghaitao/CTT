@@ -24,7 +24,7 @@ import utilities.Dataset;
  */
 public class CTT_SP3 {
 	private static SimpleDirectedWeightedGraph<CTT_ver, DefaultWeightedEdge> cttGraph;
-	private static int m=0;
+	public static int m=0;
 	// compute cost==================================================================
 	public static double computeCttCost(DataDependencyGraph graph,int cm,CloudService[] CS) 
 	{//graph 是DDG图
@@ -148,7 +148,7 @@ public class CTT_SP3 {
 	}
 	
 	//compute edge cost 计算边的值
-	private static double getEdgeCost(CTT_ver start_ver, CTT_ver end_ver,CloudService[] CS)
+	public static double getEdgeCost(CTT_ver start_ver, CTT_ver end_ver,CloudService[] CS)
 	{
 		double edgeCost=0.0;//整条边的cost
 		double endCost=0.0;//边的终点的cost
@@ -271,7 +271,7 @@ public class CTT_SP3 {
 	}
 	// /////////////////////////////////////
 	public static void main(String[] args) {
-		DDGGenerator.setFilePath("xmlFolder/LineXML/testlineDDG500.xml");
+		DDGGenerator.setFilePath("xmlFolder/LineXML/testlineDDG300.xml");
 		DataDependencyGraph graph = DDGGenerator.getDDG();
 		long startTime = System.currentTimeMillis();
 		double result;
