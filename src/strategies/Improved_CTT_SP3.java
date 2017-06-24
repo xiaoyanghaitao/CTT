@@ -45,6 +45,8 @@ public class Improved_CTT_SP3 {
 			candidates.add(startVer);
 			CTT_ver2[] dataset_iInCS = new CTT_ver2[m]; // Di在所有服务商处存储的节点
 
+			double accumulatedCandidateNum = 0.0;
+			
 			for (int i = 0; i < datasetNum; i++) { // 遍历全部有意义的数据集，进行计算
 
 				// 找出到数据集i花销最小的存放方式
@@ -108,7 +110,9 @@ public class Improved_CTT_SP3 {
 				// 把所有新生成的节点加入到候选节点中
 				for (CTT_ver2 v : dataset_iInCS)
 					candidates.add(v);
+				accumulatedCandidateNum += candidates.size();
 			}
+			System.out.println("average candidate number is "+accumulatedCandidateNum/datasetNum);
 
 			// 计算candidates到结束节点的最小花费
 			{
@@ -192,7 +196,7 @@ public class Improved_CTT_SP3 {
 
 	// /////////////////////////////////////
 	public static void main(String[] args) {
-		DDGGenerator.setFilePath("xmlFolder/LineXML/testlineDDG400.xml");
+		DDGGenerator.setFilePath("xmlFolder/LineXML/testlineDDG500.xml");
 		DataDependencyGraph graph = DDGGenerator.getDDG();
 		long startTime = System.currentTimeMillis();
 		double result;

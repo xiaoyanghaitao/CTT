@@ -9,7 +9,7 @@ import utilities.DataDependencyGraph;
 public class MultiCS_AddCS_Comparison {
 
 	public static void main(String[] args) {
-		DDGGenerator.setFilePath("xmlFolder/LineXML/testlineDDG100.xml");
+		DDGGenerator.setFilePath("xmlFolder/LineXML/testlineDDG500.xml");
 		DataDependencyGraph graph = DDGGenerator.getDDG();
 		long startTime = System.currentTimeMillis();
 		int m = 10;
